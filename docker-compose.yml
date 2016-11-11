@@ -1,0 +1,32 @@
+version: '2'
+
+networks:
+  default:
+    external:
+      name: "nat"
+
+services:
+  sqlserver:
+    build:
+      context: ./sqlserver/
+    image:  sqlserver
+    hostname: sqlserver
+    ports:
+      - "1433:1433"
+    environment:
+      - MSDTC_TEST_DATABASE=ODBCTest
+      - MSDTC_SQLSERVER_PASSWORD=Passw0rd
+      - MSDTC_TESTER_HOSTNAME=dtctester
+
+  dtctester:
+    build:
+      context: ./dtctester/
+    image:  dtctester
+    hostname: dtctester
+    links:
+      - sqlserver
+    environment:
+      - MSDTC_SQLSERVER_HOSTNAME=sqlserver
+      - MSDTC_SQLSERVER_PORT=1433
+      - MSDTC_SQLSERVER_PASSWORD=Passw0rd
+      - MSDTC_TEST_DATABASE=ODBCTest
